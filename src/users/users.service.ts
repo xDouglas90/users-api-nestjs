@@ -43,6 +43,16 @@ export class UsersService {
     return user;
   }
 
+  async findOneByEmail(email: string): Promise<User> {
+    const user = users.find((user) => user.email === email);
+
+    if (!user) {
+      throw new BadRequestException(`User with email ${email} not found`);
+    }
+
+    return user;
+  }
+
   create(createUserDto: CreateUserDto): User {
     const newUser = {
       id: users.length + 1,
