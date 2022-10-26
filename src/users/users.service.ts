@@ -4,13 +4,27 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { StringUtils } from 'src/utils/string-utils';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    private stringUtils: StringUtils,
   ) {}
+
+  create(createUserDto: CreateUserDto) {
+    const newUser = new User();
+
+    newUser.name = this.stringUtils.capitalize(createUserDto.name);
+    newUser.email = this.stringUtils.toLowerCase(createUserDto.email);
+    newUser.stack = createUserDto.stack.map((stack) =>
+      this.stringUtils.toLowerCase(stack),
+    );
+
+    return this.usersRepository.save(newUser);
+  }
 
   findAll() {
     return this.usersRepository.find({ order: { name: 'ASC' } });
@@ -34,12 +48,6 @@ export class UsersService {
     }
 
     return user;
-  }
-
-  create(createUserDto: CreateUserDto) {
-    const newUser = this.usersRepository.create(createUserDto);
-
-    return this.usersRepository.save(newUser);
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
