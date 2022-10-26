@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -35,7 +40,7 @@ export class UsersService {
     const user = users.find((user) => user.id === id);
 
     if (!user) {
-      throw new BadRequestException(`User #${id} not found`);
+      throw new NotFoundException(`User with ID #${id} not found`);
     }
 
     return user;
@@ -45,7 +50,7 @@ export class UsersService {
     const user = users.find((user) => user.email === email);
 
     if (!user) {
-      throw new BadRequestException(`User with email ${email} not found`);
+      throw new NotFoundException(`User with email ${email} not found`);
     }
 
     return user;
@@ -55,7 +60,7 @@ export class UsersService {
     const user = users.find((user) => user.email === createUserDto.email);
 
     if (user) {
-      throw new BadRequestException(
+      throw new ConflictException(
         `User with email ${createUserDto.email} already exists`,
       );
     }
