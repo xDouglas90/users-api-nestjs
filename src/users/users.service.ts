@@ -9,16 +9,19 @@ const users: User[] = [
     id: 1,
     name: 'John Doe',
     email: 'john@gmail.com',
+    stack: ['React', 'Node'],
   },
   {
     id: 2,
     name: 'Jane Doe',
     email: 'jane@gmail.com',
+    stack: ['Angular', 'Spring'],
   },
   {
     id: 3,
     name: 'June Doe',
     email: 'june@gmail.com',
+    stack: ['Vue', 'Nuxt'],
   },
 ];
 
