@@ -7,6 +7,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { StringUtils } from 'src/utils/string-utils';
 
 // mock data for now - we'll replace this with a real database later
 const users: User[] = [
@@ -32,6 +33,33 @@ const users: User[] = [
 
 @Injectable()
 export class UsersService {
+  constructor(private readonly stringUtils: StringUtils) {}
+
+  create(createUserDto: CreateUserDto): User {
+    const user = users.find((user) => user.email === createUserDto.email);
+
+    if (user) {
+      throw new ConflictException(
+        `User with email ${createUserDto.email} already exists`,
+      );
+    }
+
+    const id = users.length + 1;
+
+    const newUser = new User();
+
+    newUser.id = id;
+    newUser.name = this.stringUtils.capitalize(createUserDto.name);
+    newUser.email = this.stringUtils.toLowerCase(createUserDto.email);
+    newUser.stack = createUserDto.stack.map((tech) =>
+      this.stringUtils.capitalize(tech),
+    );
+
+    users.push(newUser);
+
+    return newUser;
+  }
+
   findAll(): User[] {
     return users;
   }
@@ -54,24 +82,6 @@ export class UsersService {
     }
 
     return user;
-  }
-
-  create(createUserDto: CreateUserDto): User {
-    const user = users.find((user) => user.email === createUserDto.email);
-
-    if (user) {
-      throw new ConflictException(
-        `User with email ${createUserDto.email} already exists`,
-      );
-    }
-
-    const id = users.length + 1;
-
-    const newUser = { id, ...createUserDto };
-
-    users.push(newUser);
-
-    return newUser;
   }
 
   update(id: number, updateUserDto: UpdateUserDto): User {
