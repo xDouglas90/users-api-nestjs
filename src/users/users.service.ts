@@ -1,12 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
-export type User = {
-  id: number;
-  name: string;
-  email: string;
-};
+import { User } from './entities/user.entity';
 
 // mock data for now - we'll replace this with a real database later
 const users: User[] = [
