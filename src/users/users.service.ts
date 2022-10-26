@@ -8,6 +8,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { StringUtils } from 'src/utils/string-utils';
+import { UuidUtils } from 'src/utils/uuid-utils';
 
 // mock data for now - we'll replace this with a real database later
 const users: User[] = [
@@ -33,7 +34,10 @@ const users: User[] = [
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly stringUtils: StringUtils) {}
+  constructor(
+    private readonly stringUtils: StringUtils,
+    private readonly uuid: UuidUtils,
+  ) {}
 
   create(createUserDto: CreateUserDto): User {
     const user = users.find((user) => user.email === createUserDto.email);
@@ -44,7 +48,7 @@ export class UsersService {
       );
     }
 
-    const id = users.length + 1;
+    const id = this.uuid.generate();
 
     const newUser = new User();
 
