@@ -1,96 +1,66 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 
-// mock data for now - we'll replace this with a real database later
-const users: User[] = [
-  {
-    id: 1,
-    name: 'John Doe',
-    email: 'john@gmail.com',
-    stack: ['React', 'Node'],
-  },
-  {
-    id: 2,
-    name: 'Jane Doe',
-    email: 'jane@gmail.com',
-    stack: ['Angular', 'Spring'],
-  },
-  {
-    id: 3,
-    name: 'June Doe',
-    email: 'june@gmail.com',
-    stack: ['Vue', 'Nuxt'],
-  },
-];
-
 @Injectable()
 export class UsersService {
-  findAll(): User[] {
-    return users;
+  constructor(
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
+  ) {}
+
+  findAll() {
+    return this.usersRepository.find({ order: { name: 'ASC' } });
   }
 
-  findOne(id: number): User {
-    const user = users.find((user) => user.id === id);
+  findOne(id: number) {
+    const user = this.usersRepository.findOneBy({ id: id });
 
     if (!user) {
-      throw new BadRequestException(`User #${id} not found`);
+      throw new NotFoundException(`User with ID #${id} not found`);
     }
 
     return user;
   }
 
   async findOneByEmail(email: string): Promise<User> {
-    const user = users.find((user) => user.email === email);
+    const user = this.usersRepository.findOneBy({ email: email });
 
     if (!user) {
-      throw new BadRequestException(`User with email ${email} not found`);
+      throw new NotFoundException(`User with email ${email} not found`);
     }
 
     return user;
   }
 
-  create(createUserDto: CreateUserDto): User {
-    const user = users.find((user) => user.email === createUserDto.email);
+  create(createUserDto: CreateUserDto) {
+    const newUser = this.usersRepository.create(createUserDto);
 
-    if (user) {
-      throw new BadRequestException(
-        `User with email ${createUserDto.email} already exists`,
-      );
-    }
-
-    const id = users.length + 1;
-
-    const newUser = { id, ...createUserDto };
-
-    users.push(newUser);
-
-    return newUser;
+    return this.usersRepository.save(newUser);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto): User {
-    const user = this.findOne(id);
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.usersRepository.findOneBy({ id: id });
 
     if (!user) {
-      throw new BadRequestException(`User #${id} not found`);
+      throw new NotFoundException(`User with ID #${id} not found`);
     }
-    const index = users.findIndex((user) => user.id === id);
 
-    users[index] = { ...user, ...updateUserDto };
+    const updatedUser = Object.assign(user, updateUserDto);
 
-    return users[index];
+    return this.usersRepository.save(updatedUser);
   }
 
-  remove(id: number): void {
-    const user = this.findOne(id);
+  async remove(id: number) {
+    const user = await this.usersRepository.findOneBy({ id: id });
 
     if (!user) {
-      throw new BadRequestException(`User #${id} not found`);
+      throw new NotFoundException(`User with ID #${id} not found`);
     }
 
-    const index = users.findIndex((user) => user.id === id);
-
-    users.splice(index, 1);
+    this.usersRepository.remove(user);
   }
 }
