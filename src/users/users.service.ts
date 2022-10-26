@@ -54,11 +54,20 @@ export class UsersService {
   }
 
   create(createUserDto: CreateUserDto): User {
-    const newUser = {
-      id: users.length + 1,
-      ...createUserDto,
-    };
+    const user = users.find((user) => user.email === createUserDto.email);
+
+    if (user) {
+      throw new BadRequestException(
+        `User with email ${createUserDto.email} already exists`,
+      );
+    }
+
+    const id = users.length + 1;
+
+    const newUser = { id, ...createUserDto };
+
     users.push(newUser);
+
     return newUser;
   }
 
