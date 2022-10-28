@@ -26,6 +26,11 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Useful links
+
+- [Best Way to Structure Your Directory/Code](https://medium.com/the-crowdlinker-chronicle/best-way-to-structure-your-directory-code-nestjs-a06c7a641401)
+- [Validação e Serialização no NestJS: class-validator e class-transformer](https://www.treinaweb.com.br/blog/validacao-e-serializacao-no-nestjs-class-validator-e-class-transformer)
+
 ## Installation
 
 ```bash
